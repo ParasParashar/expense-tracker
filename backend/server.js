@@ -1,6 +1,7 @@
 import express from "express";
 import http from "http";
 import dotenv from "dotenv";
+import path from "path";
 import cors from "cors";
 // apllo server imports
 import { ApolloServer } from "@apollo/server";
@@ -17,6 +18,7 @@ import connectToMongoDb from "./db/connectDb.js";
 import { buildContext } from "graphql-passport";
 import { configurePassport } from "./passport/passport.config.js";
 
+const __dirname = path.resolve();
 dotenv.config();
 configurePassport();
 
@@ -69,6 +71,11 @@ app.use(
     context: async ({ req, res }) => buildContext({ req, res }),
   })
 );
+// adding the optimistic version and production build setup
+app.use(express.static(path.join(__dirname, "frontend/dist")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend/dist", "index.html"));
+});
 
 // Modified server startup
 await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
