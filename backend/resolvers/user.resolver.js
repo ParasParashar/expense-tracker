@@ -13,8 +13,8 @@ const userResolver = {
         if (existingUser) {
           throw new Error("User already exists");
         }
-        const salt = bcrypt.genSalt(10);
-        const hashPassword = bcrypt.hash(password, salt);
+        const salt = await bcrypt.genSalt(10);
+        const hashPassword = await bcrypt.hash(password, salt);
         const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${username}`;
         const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${username}`;
 
@@ -25,6 +25,7 @@ const userResolver = {
           gender,
           profilePicture: gender === "male" ? boyProfilePic : girlProfilePic,
         });
+
         await newUser.save();
         await context.login(newUser);
         return newUser;
@@ -57,7 +58,7 @@ const userResolver = {
         });
         context.res.clearCookie("connect.sid");
 
-        return { message: "Logout successfully" };
+        return { message: "Logged out successfully" };
       } catch (err) {
         console.error("Error in logout:", err);
         throw new Error(err.message || "Internal server error");
@@ -67,7 +68,7 @@ const userResolver = {
   Query: {
     authUser: async (_, __, context) => {
       try {
-        const user = await context.getuser();
+        const user = await context.getUser();
         return user;
       } catch (error) {
         console.error("Error in authUser: ", error);
