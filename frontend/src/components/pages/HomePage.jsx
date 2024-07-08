@@ -7,40 +7,77 @@ import { GET_AUTHENTICATED_USER } from "../../graphql/queries/user.query";
 import { MdLogout } from "react-icons/md";
 import { useMutation, useQuery } from "@apollo/client";
 import { LOGOUT } from "../../graphql/mutations/user.mutation";
+import { GET_TRANSACTION_STATISTICS } from "../../graphql/queries/transaction.query";
+import { useEffect, useState } from "react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const HomePage = () => {
-  const { data: authUserData } = useQuery(GET_AUTHENTICATED_USER);
-  const [logout, { loading }] = useMutation(LOGOUT, {
-    refetchQueries: ["GetAuthenticatedUser"],
-  });
-  const chartData = {
-    labels: ["Saving", "Expense", "Investment"],
+  const { data } = useQuery(GET_TRANSACTION_STATISTICS);
+  const [chartData, setChartData] = useState({
+    labels: [],
     datasets: [
       {
-        label: "%",
-        data: [13, 8, 3],
-        backgroundColor: [
-          "rgba(75, 192, 192)",
-          "rgba(255, 99, 132)",
-          "rgba(54, 162, 235)",
-        ],
-        borderColor: [
-          "rgba(75, 192, 192)",
-          "rgba(255, 99, 132)",
-          "rgba(54, 162, 235, 1)",
-        ],
+        label: "₹",
+        data: [],
+        backgroundColor: [],
+        borderColor: [],
         borderWidth: 1,
         borderRadius: 30,
         spacing: 10,
         cutout: 130,
       },
     ],
-  };
+  });
+  const { data: authUserData, loading: profileLoading } = useQuery(
+    GET_AUTHENTICATED_USER
+  );
+  const [logout, { loading, client }] = useMutation(LOGOUT, {
+    refetchQueries: ["GetAuthenticatedUser"],
+  });
+
+  useEffect(() => {
+    if (data?.getUserStatistics) {
+      const categories = data.getUserStatistics.map((item) => item.category);
+      const totalAmount = data.getUserStatistics.map(
+        (item) => item.totalAmount
+      );
+      const backgroundColors = [];
+      const borderColors = [];
+
+      categories.forEach((category) => {
+        if (category === "saving") {
+          backgroundColors.push("rgba(75, 192, 192)");
+          borderColors.push("rgba(75, 192, 192)");
+        } else if (category === "expense") {
+          backgroundColors.push("rgba(255, 99, 132)");
+          borderColors.push("rgba(255, 99, 132)");
+        } else if (category === "investment") {
+          backgroundColors.push("rgba(54, 162, 235)");
+          borderColors.push("rgba(54, 162, 235)");
+        }
+      });
+      setChartData((prev) => ({
+        labels: categories,
+        datasets: [
+          {
+            ...prev.datasets[0],
+            data: totalAmount,
+            backgroundColor: backgroundColors,
+            borderColor: borderColors,
+          },
+        ],
+      }));
+    }
+  }, [data]);
 
   const handleLogout = async () => {
-    await logout();
+    try {
+      await logout();
+      client.resetStore();
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -48,13 +85,21 @@ const HomePage = () => {
       <div className="flex flex-col gap-6 items-center max-w-7xl mx-auto z-20 relative justify-center">
         <div className="flex items-center">
           <p className="md:text-4xl text-2xl lg:text-4xl font-bold text-center relative z-50 mb-4 mr-4 bg-gradient-to-r from-pink-600 via-indigo-500 to-pink-400 inline-block text-transparent bg-clip-text">
-            Spend wisely, track wisely
+            Hey! &nbsp;
+            <span className="text-blue-500/90 transition-all ease-in-out duration-500 animate-pulse ">
+              {authUserData?.authUser.username}
+            </span>
+            &nbsp; Spend wisely, track wisely
           </p>
-          <img
-            src={"https://tecdn.b-cdn.net/img/new/avatars/2.webp"}
-            className="w-11 h-11 rounded-full border cursor-pointer"
-            alt="Avatar"
-          />
+          {profileLoading ? (
+            <span className="  bg-gray-200  dark:bg-gray-700 animate-pulse h-11 w-11 rounded-full" />
+          ) : (
+            <img
+              src={authUserData?.authUser?.profilePicture}
+              className="w-11 h-11 rounded-full border cursor-pointer"
+              alt="Avatar"
+            />
+          )}
           {!loading && (
             <MdLogout
               className="mx-2 w-5 h-5 cursor-pointer"

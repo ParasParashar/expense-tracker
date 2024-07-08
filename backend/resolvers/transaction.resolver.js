@@ -60,6 +60,27 @@ const transactionResolver = {
         throw new Error("server error: " + error.message);
       }
     },
+    getUserStatistics: async (_, __, context) => {
+      try {
+        if (!context.getUser()) throw new Error("Unauthorized");
+        const userId = await context.getUser()._id;
+        const transactions = await Transaction.find({ userId: userId });
+        const categoryMap = {};
+        transactions.forEach((transaction) => {
+          if (!categoryMap[transaction.category]) {
+            categoryMap[transaction.category] = 0;
+          }
+          categoryMap[transaction.category] += transaction.amount;
+        });
+        const mapData = Object.entries(categoryMap).map(
+          ([category, totalAmount]) => ({ category, totalAmount })
+        );
+        return mapData;
+      } catch (error) {
+        console.error("error in getting particular transaction", error.message);
+        throw new Error("server error: " + error.message);
+      }
+    },
   },
 };
 export default transactionResolver;

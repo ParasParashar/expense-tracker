@@ -17,7 +17,9 @@ const TransactionPage = () => {
     },
   });
 
-  const [updateTransactoin, { loading }] = useMutation(UPDATE_TRANSACTION);
+  const [updateTransactoin, { loading }] = useMutation(UPDATE_TRANSACTION, {
+    refetchQueries: ["GetTransactionStatus", "GetTransactions"],
+  });
 
   const [formData, setFormData] = useState({
     description: data?.transaction?.description || "",
@@ -57,7 +59,7 @@ const TransactionPage = () => {
       toast.success("Updated transaction");
     } catch (error) {
       console.log("Error in getting the trasaction", error.message);
-      toast.error("Something went wrong");
+      toast.error(error.message);
     }
   };
 

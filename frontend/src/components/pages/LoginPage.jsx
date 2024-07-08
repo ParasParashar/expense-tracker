@@ -23,12 +23,16 @@ const LoginPage = () => {
   });
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login({
-      variables: {
-        input: loginData,
-      },
-    });
-    toast.success("Login successful");
+    try {
+      await login({
+        variables: {
+          input: loginData,
+        },
+      });
+      toast.success("Login successful");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (

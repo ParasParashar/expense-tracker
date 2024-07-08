@@ -10,11 +10,19 @@ type Transaction{
     date:String!
 
 }
+
+
 type Query{
     transactions:[Transaction!]
     transaction(transactionId:ID!):Transaction
-
+    getUserStatistics:[CategoryStatistics!]
 }
+
+type CategoryStatistics{
+    category:String!
+    totalAmount:Float!
+}
+
 
 type Mutation{
     createTransaction(input:createTransactionInput!):Transaction

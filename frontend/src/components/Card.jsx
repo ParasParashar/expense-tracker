@@ -16,9 +16,9 @@ const categoryColorMap = {
   investment: "from-blue-700 to-blue-400",
 };
 
-const Card = ({ item }) => {
+const Card = ({ item, authUser }) => {
   const [deleteTransaction, { loading }] = useMutation(DELETE_TRANSACTION, {
-    refetchQueries: ["GetTransactions"],
+    refetchQueries: ["GetTransactions", "GetTransactionStatus"],
   });
   const cardClass = categoryColorMap[item.category];
   const handleDelete = async () => {
@@ -38,7 +38,7 @@ const Card = ({ item }) => {
             {item.category[0].toUpperCase() + item.category.slice(1)}
           </h2>
           <div className="flex items-center gap-2">
-            <button onClick={handleDelete}>
+            <button disabled={loading} onClick={handleDelete}>
               <FaTrash className={"cursor-pointer"} onClick={handleDelete} />
             </button>
             <Link to={`/transaction/${item._id}`}>
@@ -68,7 +68,7 @@ const Card = ({ item }) => {
             {formatDate(item.date)}
           </p>
           <img
-            src={"https://tecdn.b-cdn.net/img/new/avatars/2.webp"}
+            src={authUser?.profilePicture}
             className="h-8 w-8 border rounded-full"
             alt="Avatar Image"
           />
