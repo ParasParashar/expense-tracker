@@ -44,20 +44,19 @@ const transactionResolver = {
       try {
         if (!context.getUser()) throw new Error("user not found");
         const userId = await context.getUser()._id;
-        const transactions = await Transaction.find({ user: userId });
+        const transactions = await Transaction.find({ userId: userId });
         return transactions;
       } catch (error) {
         console.error("error in getting user transactions", error);
         throw new Error("server error: " + error.message);
       }
     },
-    transaction: async (_, __, { transactionId }) => {
+    transaction: async (_, { transactionId }) => {
       try {
-        if (!context.getUser()) throw new Error("user not found");
-        const transaction = await Transaction.findById({ _id: transactionId });
+        const transaction = await Transaction.findById(transactionId);
         return transaction;
       } catch (error) {
-        console.error("error in getting particular transaction", error);
+        console.error("error in getting particular transaction", error.message);
         throw new Error("server error: " + error.message);
       }
     },

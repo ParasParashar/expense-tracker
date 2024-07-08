@@ -25,7 +25,7 @@ const transactionSchema = mongoose.Schema({
     required: true,
   },
   location: {
-    type: Number,
+    type: String,
     default: "Unknown",
   },
   date: {
