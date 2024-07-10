@@ -1,6 +1,6 @@
 import User from "../models/user.schema.js";
 import bcrypt from "bcryptjs";
-import { users } from "../dummyData/data.js";
+import Transaction from "../models/transaction.schema.js";
 const userResolver = {
   Mutation: {
     signUp: async (_, { input }, context) => {
@@ -82,6 +82,17 @@ const userResolver = {
       } catch (error) {
         console.error("Error in getting user query: ", error);
         throw new Error("Internal server error", error.message);
+      }
+    },
+  },
+  User: {
+    transactions: async (parent) => {
+      try {
+        const transactions = await Transaction.find({ userId: parent._id });
+        return transactions;
+      } catch (error) {
+        console.log("error in relationship of user");
+        throw new Error("error in relationship", error.message);
       }
     },
   },

@@ -16,7 +16,7 @@ const categoryColorMap = {
   investment: "from-blue-700 to-blue-400",
 };
 
-const Card = ({ item, authUser }) => {
+const Card = ({ item, profilePicture }) => {
   const [deleteTransaction, { loading }] = useMutation(DELETE_TRANSACTION, {
     refetchQueries: ["GetTransactions", "GetTransactionStatus"],
   });
@@ -68,7 +68,7 @@ const Card = ({ item, authUser }) => {
             {formatDate(item.date)}
           </p>
           <img
-            src={authUser?.profilePicture}
+            src={profilePicture}
             className="h-8 w-8 border rounded-full"
             alt="Avatar Image"
           />
