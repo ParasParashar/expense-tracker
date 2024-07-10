@@ -18,7 +18,7 @@ const categoryColorMap = {
 
 const Card = ({ item, profilePicture }) => {
   const [deleteTransaction, { loading }] = useMutation(DELETE_TRANSACTION, {
-    refetchQueries: ["GetTransactions", "GetTransactionStatus"],
+    refetchQueries: ["GetUserTransactions", "GetTransactionStatus"],
   });
   const cardClass = categoryColorMap[item.category];
   const handleDelete = async () => {
